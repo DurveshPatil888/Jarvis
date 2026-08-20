@@ -1,0 +1,5 @@
+{
+  "watch": ["server.js", "src"],
+  "ext": "js,mjs,cjs,json",
+  "ignore": ["src/workers/*"]
+}

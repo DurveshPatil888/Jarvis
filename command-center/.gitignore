@@ -1,0 +1,36 @@
+# ========================
+# THE IMMORTAL JARVIS SECRETS
+# ========================
+
+# 1. Secret Keys & Passwords
+.env
+backend/.env
+
+# 2. Heavy Node Dependencies
+node_modules/
+backend/node_modules/
+
+# 3. Automation Profiles & Auth (CRITICAL: DO NOT PUSH)
+.brave-automation-profile/
+.wwebjs_auth/
+.wwebjs_cache/
+backend/.wwebjs_cache/
+
+# 4. Build Files
+dist/
+dist-ssr/
+build/
+
+# 5. Logs & Python Cache
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+__pycache__/
+*.pyc
+
+# 6. Editor Files
+.vscode/
+!.vscode/extensions.json
+.idea
+.DS_Store
