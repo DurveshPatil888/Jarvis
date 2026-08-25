@@ -5,6 +5,13 @@
  * this file exists; it just emits "log" and "power:sync" into the
  * void, and this is the one place that turns those into `io.emit`.
  */
+/**
+ * registerSocketHandlers
+ * -----------------------------------------------------------------
+ * Bridges Socket.io <-> ProcessManager. ProcessManager doesn't know
+ * this file exists; it just emits "log" and "power:sync" into the
+ * void, and this is the one place that turns those into `io.emit`.
+ */
 export default function registerSocketHandlers(io, processManager, aiRouter) {
   io.on('connection', (socket) => {
     processManager.log('info', `CLIENT_CONNECTED :: ${socket.id}`);
@@ -53,6 +60,11 @@ export default function registerSocketHandlers(io, processManager, aiRouter) {
         return;
       }
       processManager.sendCommand(id, command, commandPayload ?? {});
+    });
+
+    // --- NAYA LOGIC: Python se volume level le kar React ko bhejna ---
+    socket.on('audio_level', (level) => {
+      socket.broadcast.emit('audio_level', level);
     });
 
     socket.on('disconnect', () => {

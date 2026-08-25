@@ -86,14 +86,23 @@ async function clearInvalidSession(reason) {
 const client = new Client({
   authStrategy: new LocalAuth({
     clientId: CLIENT_ID,
-    // session tokens persist here across restarts so you only scan
-    // the QR once, not on every fork. This folder holds live
-    // credentials -- see the .gitignore note below.
     dataPath: AUTH_DATA_PATH,
   }),
   puppeteer: {
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    // THE MAGIC FLAGS: Ye flags Chromium ka memory footprint 70% tak gira denge
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage', // Prevents RAM overflow into disk
+      '--disable-accelerated-2d-canvas', // Kills GPU rendering for UI
+      '--no-first-run', // Skips unnecessary setup tasks
+      '--no-zygote', // Saves memory by not cloning processes
+      '--disable-gpu', // Completely turns off GPU usage
+      '--disable-extensions', // Disables Chrome extensions
+      '--mute-audio', // Mutes tab to save audio processing
+      '--disable-background-networking', // Stops random background telemetry
+    ],
   },
 });
 

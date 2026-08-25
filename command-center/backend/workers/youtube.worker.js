@@ -71,7 +71,7 @@ async function clearProfileLock() {
 async function launch(isRetry = false) {
   try {
     browser = await puppeteer.launch({
-      headless: false,
+      headless: false, // Kept visible for YouTube
       executablePath: BRAVE_PATH,
       userDataDir: AUTOMATION_PROFILE_DIR,
       defaultViewport: null,
@@ -79,6 +79,13 @@ async function launch(isRetry = false) {
       args: [
         '--start-maximized',
         '--disable-blink-features=AutomationControlled',
+        // --- RAM & CPU OPTIMIZATION FLAGS ---
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage', // Stops memory overflow into disk (Fixes hangs)
+        '--no-first-run',
+        '--no-zygote', // Saves RAM by avoiding process cloning
+        '--disable-extensions', // Blocks heavy Brave extensions from loading
       ],
     });
   } catch (err) {
@@ -335,7 +342,6 @@ process.on('SIGTERM', async () => {
       message: 'no browser was open, nothing to clean up',
     });
     process.exit(0);
-    return;
   }
 
   const browserProcess = browser?.process?.() ?? null;

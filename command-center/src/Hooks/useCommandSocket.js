@@ -73,6 +73,9 @@ export default function useCommandSocket() {
   const [logs, setLogs] = useState([]);
   const [connectionStatus, setConnectionStatus] = useState('connecting'); // connecting | online | offline
 
+  // --- NAYA STATE: Python se aane wali volume ke liye ---
+  const [audioLevel, setAudioLevel] = useState(0);
+
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -101,7 +104,7 @@ export default function useCommandSocket() {
     // real backend logs -- ambient heartbeats, crash reports, everything
     // ProcessManager.log() emits, relayed by socketHandler.js
     socket.on('log', (entry) => {
-      setLogs((prev) => [...prev.slice(-199), toLogEntry(entry)]); // ring buffer cap stays at 200
+      setLogs((prev) => [...prev.slice(-99), toLogEntry(entry)]); // ring buffer cap stays at 100
     });
 
     // full state snapshot -- sent on initial connect AND after every
@@ -114,6 +117,11 @@ export default function useCommandSocket() {
     // spoken confirmations ("Message fired", "System locked", etc.)
     socket.on('ai_speak', ({ text }) => {
       speakText(text);
+    });
+
+    // --- NAYA EVENT LISTENER: Dashboard UI ko animate karne ke liye ---
+    socket.on('audio_level', (level) => {
+      setAudioLevel(level);
     });
 
     return () => {
@@ -164,5 +172,6 @@ export default function useCommandSocket() {
     sendCommand,
     sendRouterCommand,
     connectionStatus,
+    audioLevel, // Isko return karna zaroori tha UI ke liye
   };
 }

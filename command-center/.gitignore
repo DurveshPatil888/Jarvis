@@ -34,3 +34,7 @@ __pycache__/
 !.vscode/extensions.json
 .idea
 .DS_Store
+
+# 7. Database
+data/
+*.db

@@ -98,7 +98,7 @@ export const COMMAND_REGISTRY = {
       },
       play: {
         description:
-          "Searches YouTube for the given query and plays the first video result. If the user does not specify a song/video, DO NOT fail -- generate a sensible default query yourself (e.g. 'trending music', 'coding lofi', 'top hits 2025') so this command always succeeds.",
+          "Searches YouTube for the given query and plays the first video result. If the user does not specify a song/video, DO NOT fail -- generate a sensible default query yourself (e.g. 'trending music', 'coding lofi', 'top hits 2026') so this command always succeeds.",
         parameters: {
           type: 'object',
           properties: {
@@ -117,6 +117,14 @@ export const COMMAND_REGISTRY = {
       },
       resume: {
         description: 'Resumes a currently paused YouTube video.',
+        parameters: { type: 'object', properties: {}, required: [] },
+      },
+      next: {
+        description: 'Skips to the next video or song on YouTube.',
+        parameters: { type: 'object', properties: {}, required: [] },
+      },
+      previous: {
+        description: 'Goes back to the previous video or song on YouTube.',
         parameters: { type: 'object', properties: {}, required: [] },
       },
     },
@@ -138,7 +146,8 @@ export const COMMAND_REGISTRY = {
           properties: {
             app_name: {
               type: 'string',
-              description: "The name of the app to open, exactly as spoken by the user, e.g. 'spotify', 'vs code', 'brave browser'.",
+              description:
+                "The name of the app to open, exactly as spoken by the user, e.g. 'spotify', 'vs code', 'brave browser'.",
             },
           },
           required: ['app_name'],
@@ -152,7 +161,8 @@ export const COMMAND_REGISTRY = {
           properties: {
             app_name: {
               type: 'string',
-              description: "The name of the app to close, exactly as spoken by the user, e.g. 'spotify', 'chrome', 'notepad'.",
+              description:
+                "The name of the app to close, exactly as spoken by the user, e.g. 'spotify', 'chrome', 'notepad'.",
             },
           },
           required: ['app_name'],
@@ -217,7 +227,8 @@ export const COMMAND_REGISTRY = {
             action: {
               type: 'string',
               enum: ['play_pause', 'next', 'previous'],
-              description: "Media action: 'play_pause' toggles play/pause, 'next' skips to next track, 'previous' goes to previous track.",
+              description:
+                "Media action: 'play_pause' toggles play/pause, 'next' skips to next track, 'previous' goes to previous track.",
             },
           },
           required: ['action'],
@@ -242,10 +253,45 @@ export const COMMAND_REGISTRY = {
             query: {
               type: 'string',
               description:
-                "The song name, search term, or media_control sub-action (play_pause / next / previous). Required for play_specific and search; required for media_control.",
+                'The song name, search term, or media_control sub-action (play_pause / next / previous). Required for play_specific and search; required for media_control.',
             },
           },
           required: ['app_name', 'action'],
+        },
+      },
+    },
+  },
+
+  research: {
+    label: 'Research & Calculation',
+    commands: {
+      fast_math: {
+        description:
+          "Instantly evaluates mathematical expressions (e.g. 'square of 25', '15% of 200', '5 * 5'). Gives direct calculation results bypassing heavy search.",
+        parameters: {
+          type: 'object',
+          properties: {
+            expression: {
+              type: 'string',
+              description:
+                'The mathematical expression to evaluate, exactly as spoken or in standard math notation.',
+            },
+          },
+          required: ['expression'],
+        },
+      },
+      quick_search: {
+        description:
+          "Searches the web for general knowledge, history, facts, or current events (e.g. 'Who was Shivaji Maharaj?', 'Capital of France'). Returns short, factual answers.",
+        parameters: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'The search query to look up on the web.',
+            },
+          },
+          required: ['query'],
         },
       },
     },

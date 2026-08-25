@@ -10,7 +10,11 @@ import registerSocketHandlers from './src/socket/Sockethandler.js';
 import aiRouter from './src/router/AIRouter.js';
 import mockResolver from './src/resolvers/mockResolver.js'; 
 import llmResolver from './src/resolvers/llmResolver.js';
+import { initMemoryStore } from './src/utils/memoryStore.js';
 
+// DOTENV ya config load hone ke turant baad yeh line daal de:
+initMemoryStore(); 
+console.log("[SYSTEM] Database initialized.");
 // active resolver setup
 aiRouter.setResolver(llmResolver);
 

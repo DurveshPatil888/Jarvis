@@ -2,6 +2,7 @@ import { fork } from 'child_process';
 import { EventEmitter } from 'events';
 import { POWERS_REGISTRY } from './src/powers.config.js';
 import { COMMAND_REGISTRY } from './commandRegistry.js';
+import { rememberFact } from "./src/utils/memoryStore.js";
 
 const STATUS = {
   STOPPED: 'stopped',
@@ -79,6 +80,15 @@ class ProcessManager extends EventEmitter {
     this.emit('ai_speak', { text });
   }
 
+  /** Same-process callers to save facts directly to SQLite */
+  remember(key, value) {
+    try {
+      rememberFact(key, value);
+    } catch (err) {
+      this.log('error', `MEMORY :: direct remember failed - ${err.message}`);
+    }
+  }
+
   broadcastState() {
     this.emit('power:sync', this.getSnapshot());
   }
@@ -136,9 +146,11 @@ class ProcessManager extends EventEmitter {
     });
 
     // structured IPC contract every worker must follow (see workers/*.worker.js):
-    //   { type: "ready" }                      -> worker finished init, mark RUNNING
+    //   { type: "ready" }                     -> worker finished init, mark RUNNING
     //   { type: "qr", qr }                     -> worker needs a QR scanned, qr is a data URL
     //   { type: "log", level, message }        -> worker wants a specific log level
+    //   { type: "ai_speak", text }             -> worker wants to TTS a message
+    //   { type: "remember", key, value }       -> worker wants to save a fact to memory
     child.on('message', (msg) => {
       if (msg?.type === 'ready') {
         current.status = STATUS.RUNNING;
@@ -155,6 +167,14 @@ class ProcessManager extends EventEmitter {
         this.log(msg.level ?? 'info', `${power.label} :: ${msg.message}`);
       } else if (msg?.type === 'ai_speak') {
         this.emit('ai_speak', { text: msg.text });
+      } else if (msg?.type === 'remember') {
+        // 🧠 THE MEMORY BRIDGE FOR WORKERS
+        try {
+          rememberFact(msg.key, msg.value);
+          this.log('success', `MEMORY :: Remembered fact via ${power.label} ("${msg.key}")`);
+        } catch (err) {
+          this.log('error', `MEMORY :: failed to remember "${msg.key}" - ${err.message}`);
+        }
       }
     });
 

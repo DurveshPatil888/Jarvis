@@ -1,6 +1,12 @@
 import processManager from '../../processmanager.js';
 import { COMMAND_REGISTRY } from '../../commandRegistry.js';
 
+// ⚡ ADDED: Import the handlers Claude generated
+// (Make sure the path matches where you saved Claude's file. e.g., './researchMiddleware.js')
+import {
+  fastMathHandler,
+  quickSearchHandler,
+} from '../tools/researchMiddleware.js';
 /**
  * META_COMMANDS
  * -----------------------------------------------------------------
@@ -32,6 +38,52 @@ const META_COMMANDS = {
       'success',
       `SYSTEM_STATUS :: ${summary || 'no powers registered'}`
     );
+  },
+
+  // ⚡ --- NEW RESEARCH & CALCULATION MODULES --- ⚡
+  'research.fast_math': async (payload) => {
+    try {
+      const result = await fastMathHandler(payload);
+      processManager.log('success', `MATH :: ${result.ttsText}`);
+      // Send directly to the speaker
+      processManager.speak(result.ttsText);
+    } catch (err) {
+      processManager.log('error', `MATH ERROR :: ${err.message}`);
+      processManager.speak('Calculation error');
+    }
+  },
+
+  'research.quick_search': async (payload) => {
+    try {
+      const result = await quickSearchHandler(payload);
+
+      if (result.bypassLLM && result.ttsText) {
+        // FAST PATH: Got a direct, clean answer from API
+        processManager.log(
+          'success',
+          `SEARCH (FAST PATH) :: ${result.ttsText}`
+        );
+        processManager.speak(result.ttsText);
+      } else {
+        // FALLBACK: No direct answer. Let's speak the first search snippet instead.
+        const fallbackText =
+          result.results?.[0]?.snippet || result.results?.[0]?.title;
+
+        if (fallbackText) {
+          processManager.log('warn', `SEARCH (SNIPPET) :: ${fallbackText}`);
+          processManager.speak(fallbackText);
+        } else {
+          processManager.log(
+            'warn',
+            `SEARCH (NO RESULT) :: DuckDuckGo returned nothing.`
+          );
+          processManager.speak("I couldn't find a short answer for that.");
+        }
+      }
+    } catch (err) {
+      processManager.log('error', `SEARCH ERROR :: ${err.message}`);
+      processManager.speak('Search failed');
+    }
   },
 };
 
