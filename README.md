@@ -1,4 +1,4 @@
-Jarvis 🤖 - Agentic AI Personal Assistant
+# Jarvis 🤖 - Agentic AI Personal Assistant
 A local, voice-activated Agentic AI assistant that controls OS hardware, applications, and web services using natural language and tool calling.
 
 Tech Stack
